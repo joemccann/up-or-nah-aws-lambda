@@ -15,20 +15,24 @@ exports.handler = function(event, context){
 
   request(options, function requireCallback(error, response, body) {
 
-    if (!error && response.statusCode == 200) {
-      var message = 'Yeah! The response code message for the URL'+ url 
+    if (!error && response.statusCode <= 399) {
+      var message = 'Yeah! The response code message for the URL'
+                    + url 
                     + ' is ' 
-                    + CODES[response.statusCode] + ' which is a ' 
-        						+ response.statusCode + ' response code.'
+                    + CODES[response.statusCode] 
+                    + ' which is a ' 
+        						+ response.statusCode 
+                    + ' response code.'
       context.succeed(JSON.stringify({message: message}))
     }
     else {
       if(error) {
-        // Call the fail() method since we failed.
+        // Call the Lambda context fail() method since we failed.
         context.fail(error)
       }
       else {
-        var message = '\n\nNah! The response code message for the URL'+ url 
+        var message = '\n\nNah! The response code message for the URL'
+                      + url 
                       + ' is ' + CODES[response.statusCode] 
                       + ' which is a ' + response.statusCode 
                       + ' response code.'
