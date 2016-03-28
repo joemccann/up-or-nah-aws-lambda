@@ -1,29 +1,31 @@
 # Learn AWS Lambda and the API Gateway
 
-This is not by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and create and API that executes the Lambda funtion.
+This is not by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and create an API that executes the Lambda function.
 
-The app, **Up or Nah**, is a simple app to determine if a site is returning an error code or not when it is pinged.  It is also not exhaustive and should **never** be used for production.
+The Lambda function, **Up or Nah**, is a simple app to determine if a site is returning an error code or not when it is pinged.  It is also _not_ exhaustive and should **never** be used in production.
 
 The following assumes you:
 
- - have a Mac
- - have the [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed 
- - have your shell configured properly for [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) usage
+ - Have a Mac
+ - Have the [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed 
+ - Have your shell configured properly for [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) usage
 
 # Getting Started
 
 You need to create your Lambda function in its own directory/folder so it can be zipped up.
 
-```
+```sh
+
 mkdir -p up-or-nah && cd up-or-nah
 npm init
 npm i --save request
 vim status-codes.js
+
 ```
 
 Copy/paste/save in `status-codes.js`
 
-```
+```js
 module.exports = {
   100: 'Continue',
   101: 'Switching Protocols',
@@ -114,7 +116,11 @@ module.exports = {
 };
 ```
 
-`vim up-or-nah.js`
+```sh
+
+vim up-or-nah.js
+
+```
 
 Copy/paste/save in `up-or-nah.js`
 
@@ -136,24 +142,28 @@ exports.handler = function(event, context){
 
   request(options, function requireCallback(error, response, body) {
 
-    if (!error && response.statusCode == 200) {
-      var message = 'Yeah! The response code message for the URL'+ url 
+    if (!error && response.statusCode <= 399) {
+      var message = 'Yeah! The response code message for the URL '
+                    + url 
                     + ' is ' 
-                    + CODES[response.statusCode] + ' which is a ' 
-                    + response.statusCode + ' response code.'
-      context.succeed(JSON.stringify({message: message}))
+                    + CODES[response.statusCode] 
+                    + ' which is a ' 
+                    + response.statusCode 
+                    + ' response code.'
+      context.succeed({message: message})
     }
     else {
       if(error) {
-        // Call the fail() method since we failed.
+        // Call the Lambda context fail() method since we failed.
         context.fail(error)
       }
       else {
-        var message = '\n\nNah! The response code message for the URL'+ url 
+        var message = 'Nah! The response code message for the URL'
+                      + url 
                       + ' is ' + CODES[response.statusCode] 
                       + ' which is a ' + response.statusCode 
                       + ' response code.'
-        context.succeed(JSON.stringify({message: message}))
+        context.succeed({message: message})
       }
     }
   }) // end request()
@@ -162,11 +172,17 @@ exports.handler = function(event, context){
 
 Now you have the entire lambda function and its dependencies.  Let's zip it up (on a Mac).
 
-```zip -r up-or-nah.zip ./```
+```sh
+
+zip -r up-or-nah.zip ./
+
+```
+
+Note: this will zip _everything_ up recursively in your directory. You may want to change this if your git history gets huge.
 
 # Lambda Setup and Commands
 
-There are two major components to setup: the lambda and API Gateway permissions.
+There are two major components to setup: the Lambda Function and the API Gateway.
 
 ## Create or Use an IAM User in Your AWS Account
 
@@ -179,7 +195,11 @@ http://docs.aws.amazon.com/apigateway/latest/developerguide/setting-up.html#sett
 
 ## Get User Information 
 
-`aws iam get-user`
+```sh
+
+aws iam get-user
+
+````
 
 ```js
 {
@@ -242,7 +262,11 @@ Response should be equivalent to:
 
 If you made a mistake or need to delete it anyway...
 
-`aws lambda delete-function --function-name up-or-nah`
+```sh
+
+aws lambda delete-function --function-name up-or-nah
+
+```
 
 No output/response expected.
 
@@ -251,7 +275,9 @@ No output/response expected.
 Now, assume you make some changes and want to update the lambda function. You'll need to re-zip and then upload.
 
 ```sh
+
 zip -r up-or-nah.zip ./ && aws lambda update-function-code --function-name up-or-nah --zip-file fileb://up-or-nah.zip
+
 ```
 
 ## AWS Permissions Setup for API to Exec Lambda Functions
@@ -271,5 +297,7 @@ http://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html
 Once you set up the API Gateway, test it with a `POST`:
 
 ```sh
+
 curl -H "Content-Type: application/json" -X POST -d "{\"url\": \"http://go.com\"}" https://aw4gbgvm1c.execute-api.us-west-2.amazonaws.com/test/check
+
 ```
