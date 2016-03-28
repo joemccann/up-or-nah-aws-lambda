@@ -1,6 +1,6 @@
 # Learn AWS Lambda and the API Gateway
 
-This is by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and create and API that executes the Lambda funtion.
+This is not by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and create and API that executes the Lambda funtion.
 
 The app, **Up or Nah**, is a simple app to determine if a site is returning an error code or not when it is pinged.  It is also not exhaustive and should **never** be used for production.
 
