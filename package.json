@@ -1,0 +1,14 @@
+{
+  "name": "up-or-nah",
+  "version": "1.0.0",
+  "description": "Is the site still up or nah? If > 399 response code, probably not.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joe McCann",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.69.0"
+  }
+}
