@@ -1,18 +1,18 @@
 # Learn AWS Lambda and the API Gateway
 
-This is by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and attach to the API Gateway.
+This is by _any_ means exhaustive and assumes _a lot_.  These are notes I captured while learning how to create Lambda functions and create and API that executes the Lambda funtion.
 
-The app, Up or Nah, is a simple app to determine if a site is returning an error code or not when it is pinged.  It is also not exhaustive and should never be used for production.
+The app, **Up or Nah**, is a simple app to determine if a site is returning an error code or not when it is pinged.  It is also not exhaustive and should **never** be used for production.
 
 The following assumes you:
 
  - have a Mac
- - have the AWS CLI installed 
- - have your shell configured properly for AWS CLI usage
+ - have the [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) installed 
+ - have your shell configured properly for [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) usage
 
 # Getting Started
 
-You need to create your lambda function in its own directory/folder so it can be zipped up.
+You need to create your Lambda function in its own directory/folder so it can be zipped up.
 
 ```
 mkdir -p up-or-nah && cd up-or-nah
@@ -120,7 +120,7 @@ Copy/paste/save in `up-or-nah.js`
 
 ```
 var request = require('request')
-	, CODES = require('./status-codes')
+  , CODES = require('./status-codes')
 
 // Up or Nah Lambda Function Definition
 
@@ -137,24 +137,24 @@ var url = event.url
     // Start the request
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-        	var message = 'Yeah! The response code message for the URL'+ url 
-        								+ ' is ' + CODES[response.statusCode] + ' which is a ' 
-        								+ response.statusCode + ' response code.'
-        	console.log(message)
-        	context.succeed(JSON.stringify({message: message}))
+          var message = 'Yeah! The response code message for the URL'+ url 
+                        + ' is ' + CODES[response.statusCode] + ' which is a ' 
+                        + response.statusCode + ' response code.'
+          console.log(message)
+          context.succeed(JSON.stringify({message: message}))
         }
         else {
-        	if(error) {
-        		console.error(error)
-	        	context.fail(error)
-        	}
-        	else {
-        		var message = '\n\nNah! The response code message for the URL'+ url 
-        									+ ' is ' + CODES[response.statusCode] + ' which is a ' 
-        									+ response.statusCode + ' response code.\n\n'
-        		console.log(message)
-	        	context.succeed(JSON.stringify({message: message}))
-        	}
+          if(error) {
+            console.error(error)
+            context.fail(error)
+          }
+          else {
+            var message = '\n\nNah! The response code message for the URL'+ url 
+                          + ' is ' + CODES[response.statusCode] + ' which is a ' 
+                          + response.statusCode + ' response code.\n\n'
+            console.log(message)
+            context.succeed(JSON.stringify({message: message}))
+          }
         }
     })
 };
@@ -263,6 +263,10 @@ http://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html
 Let's make it RESTful.  Follow this exactly:
 
 http://docs.aws.amazon.com/apigateway/latest/developerguide/getting-started.html#getting-started-open-console
+
+- Create an API called `Up or Nah`
+- Create a Resource called `check` (so the endpoint is `/check`)
+- Add a Method to check of type `POST`
 
 Once you set up the API Gateway, test it with a `POST`:
 
